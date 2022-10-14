@@ -91,6 +91,17 @@
     padding: 5px 10px;
     color: white;
 }
+.actiggve{
+    border: 4px solid rgb(15,172,244);
+}
+.activedark{
+    border: 4px solid #cd1636;
+
+}
+
+.activedark1:hover{
+    border: 4px solid #cd1636 ;
+}
 
 .blck{
     margin-top: 30px;

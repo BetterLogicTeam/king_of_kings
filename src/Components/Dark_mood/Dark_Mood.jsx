@@ -1,34 +1,30 @@
-import React, { useState } from 'react';
-import './Landing.css';
-import card from "../Assets/card.png"
-import KingLogo from "../Assets/logo.png"
-import Dark from "../Assets/Dark.png"
-import Btn from "../Assets/Btn.png"
-import Dark_Mood from '../Dark_mood/Dark_Mood';
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import Dark from "../Assets/Dark.png"
+import Landing from '../Landing/Landing';
 
 
-function Landing() {
-  let [value, setValue] = useState(1);
 
-  let navigate=useNavigate()
-  const increaseValue = () => {
-    if (value < 10) {
-      setValue(++value);
-      console.log("setValue", value);
-    }
-  };
-
-  const decreaseValue = () => {
-    if (value > 1) {
-      setValue(--value);
-      console.log("setValue", value);
-    }
-  };
-
+export default function Dark_Mood() {
+    let [value, setValue] = useState(1);
+let navigate=useNavigate()
+    const increaseValue = () => {
+      if (value < 10) {
+        setValue(++value);
+        console.log("setValue", value);
+      }
+    };
+  
+    const decreaseValue = () => {
+      if (value > 1) {
+        setValue(--value);
+        console.log("setValue", value);
+      }
+    };
   return (
-    <>
-    <div className='main_div'>
+    <div>
+
+<div className='main_div'>
         <div className="">
            <div className="container kig">
             <div className="row">
@@ -37,7 +33,7 @@ function Landing() {
             <div className="row justify-content-center">
                 <div className="col-md-6 responsive">
                 <div className="vid_div">
-                <video src="light.mp4" className='w-100 '></video>
+                <video src="Dark.mp4" className='w-100 '></video>
 
             </div>
                 </div>
@@ -58,12 +54,12 @@ function Landing() {
                     </div>
 
                     <div className="scnd_emg">
-                        <img src="LIGHT.png" alt="" />
+                        <img src={Dark} alt="" />
                     </div>
 
                     <div className="bttn">
-                        <div className="btn scnd_bttn actiggve" onClick={()=> navigate('/')}>LIGHT THEME</div>
-                        <div className="btn scnd_bttn" onClick={()=> navigate('/Dark_Mood')}>DARK THEME</div>
+                        <button className="btn scnd_bttn activedark1 " onClick={()=> navigate('/')}>LIGHT THEME</button>
+                        <button className="btn scnd_bttn activedark activedark1" onClick={()=>navigate('/Dark_Mood')}>DARK THEME</button>
                     </div>
 
                     <div className="blck">
@@ -84,14 +80,6 @@ function Landing() {
            </div>
         </div>
     </div>
-
-    
-
-
-    </>
-
-
+    </div>
   )
 }
-
-export default Landing
