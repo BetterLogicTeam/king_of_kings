@@ -160,11 +160,11 @@
         width: 65%;
     }
 
-    .scnd_bttn{
+    /* .scnd_bttn{
         display: flex;
         flex-direction: column;
         padding: 5px 5px;
-    }
+    } */
 
     .scnd{
         /* padding: 0px 10px; */
