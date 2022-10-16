@@ -6,10 +6,18 @@ import Dark from "../Assets/Dark.png"
 import Btn from "../Assets/Btn.png"
 import Dark_Mood from '../Dark_mood/Dark_Mood';
 import { useNavigate } from 'react-router-dom';
+import notcoonect from '../../Assets/notconnect.png'
+import connected from '../../Assets/connected.png'
+import { bnbContractAddress, bnbNftContractAbi } from '../utilies/constant';
+import { toast } from 'react-toastify';
+import { loadWeb3 } from '../apis/api';
 
-
-function Landing() {
+function Landing({ connect }) {
   let [value, setValue] = useState(1);
+  let [btnOne, setButtonOne] = useState("Mint With BNB");
+  const [ValueBNB, setValueBNB] = useState("")
+
+
 
   let navigate = useNavigate()
   const increaseValue = () => {
@@ -25,16 +33,114 @@ function Landing() {
       console.log("setValue", value);
     }
   };
-  setInterval(() => {
-      
-    document.getElementById('vid').play();
-  }, 1000);
+
+
+  const Mint_With_BNB = async () => {
+    let acc = await loadWeb3();
+
+    if (acc == "No Wallet") {
+      toast.error("No Wallet Connected")
+    }
+    else if (acc == "Wrong Network") {
+      toast.error("Wrong Newtwork please connect to test net")
+    } else {
+
+
+      try {
+        setButtonOne("Please Wait While Processing")
+
+        const web3 = window.web3;
+        let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
+        let mintingWirePrice
+        let own_Address = await nftContractOf.methods.owner().call()
+        console.log("own_Address",own_Address);
+        if (own_Address == acc) {
+          mintingWirePrice=0;
+        } else {
+          mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+          mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
+          mintingWirePrice = parseFloat(mintingWirePrice);
+          mintingWirePrice = value * mintingWirePrice
+          mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
+        }
+        console.log("mintingWirePrice",mintingWirePrice);
+
+       
+        let hash = await nftContractOf.methods.mintLight(acc, value).send({
+          from: acc,
+          value: mintingWirePrice
+        })
+        toast.success("Transaction Confirmed")
+        setButtonOne("Mint With BNB")
+
+
+      } catch (e) {
+        console.log("Error while minting ", e)
+        toast.error("Transaction failed")
+        setButtonOne("Mint With WHE")
+
+      }
+
+    }
+  }
+
+
+
+
+
+
+
+const minting_live_price=async()=>{
+  try{
+    
+    const web3 = window.web3;
+    let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
+    let Value_in_bnb=await nftContractOf.methods.lightPrice().call()
+    Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
+    setValueBNB(Value_in_bnb)
+
+
+    
+  }catch(e){
+    console.log("Erroe while get BNB value",e);
+  }
+}
+
+
+
+
+
+
+
+
+useEffect(() => {
+  minting_live_price()
+}, [])
+
+
+
+
+
+
+
+
+  // setInterval(() => {
+
+  //   document.getElementById('vid').play();
+  // }, 1000);
 
   return (
     <>
       <div className='main_div'>
+        <div className="connected_div">
+
+          {
+            connect ? <> <img src={notcoonect} alt="" width="25%" /> </> : <><img src={connected} alt="" width="25%" /></>
+          }
+        </div>
         <div className="">
           <div className="container kig">
+            {/* <img src={connected} alt="" /> */}
             <div className="row">
               <div className="col-lg-2"></div>
               <div className="col-lg-7 d-flex responsive">
@@ -66,7 +172,7 @@ function Landing() {
 
                     <div className="heding">
                       <h4 className='text-white pt-3'>GENESIS KING CROWN</h4>
-                      <p>0.4 BNB</p>
+                      <p>{ValueBNB} BNB</p>
                     </div>
 
                     <div className="scnd_emg">
@@ -87,7 +193,7 @@ function Landing() {
                     </div>
 
                     <div className="mint">
-                      <img src="mint.png" alt="" />
+                      <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
                     </div>
                   </div>
                 </div>

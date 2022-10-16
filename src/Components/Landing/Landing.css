@@ -353,3 +353,9 @@ border: 2px solid #585353;
         margin-top: -89px;
     }
 }
+
+.connected_div{
+    display: flex;
+    justify-content: end;
+    margin-top: -4rem !important;
+}
