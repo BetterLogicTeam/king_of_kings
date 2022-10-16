@@ -5,8 +5,8 @@ const networks = {
     chainId: `0x${Number(5).toString(16)}`,
     chainName: "Binance smart chain",
     nativeCurrency: {
-      name: "BSC",
-      symbol: "BNB",
+      name: "Goerli test network",
+      symbol: "eth",
       decimals: 18,
     },
     rpcUrls: [
@@ -24,7 +24,7 @@ const networks = {
       "https://bsc-dataseed4.ninicoin.io",
       "wss://bsc-ws-node.nariox.org",
     ],
-    blockExplorerUrls: ["https://bscscan.com"],
+    blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
 };
 const changeNetwork = async ({ networkName }) => {
@@ -63,7 +63,7 @@ export const disconnectWallet = async () => {
   });
   console.log("disconnect");
 };
-export const loadWeb3 = async () => {
+export const loadWeb4 = async () => {
   try {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
@@ -75,7 +75,7 @@ export const loadWeb3 = async () => {
             isItConnected = true;
             break;
           default:
-            handleNetworkSwitch("bsc");
+            handleNetworkSwitch("eth");
             isItConnected = false;
         }
       });

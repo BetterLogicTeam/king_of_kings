@@ -4,17 +4,19 @@ import Dark from "../Assets/Dark.png"
 import Landing from '../Landing/Landing';
 import { Player } from 'video-react';
 import { toast } from 'react-toastify';
-import { bnbContractAddress, bnbNftContractAbi } from '../utilies/constant';
+import { bnbContractAddress, bnbNftContractAbi, ethContractAddress, ethNftContractAbi } from '../utilies/constant';
 import { loadWeb3 } from '../apis/api';
 // import "node_modules/video-react/dist/video-react.css"; // import css
 import notcoonect from '../../Assets/notconnect.png'
 import connected from '../../Assets/connected.png'
+import { loadWeb4 } from '../apis/api2';
 
 
-export default function Dark_Mood({connect}) {
+export default function Dark_Mood({ connect }) {
     let [value, setValue] = useState(1);
     let [btnOne, setButtonOne] = useState("Mint With BNB");
     const [ValueBNB, setValueBNB] = useState("")
+    const [change_contract, setchange_contract] = useState("bnb")
 
 
 
@@ -32,6 +34,7 @@ export default function Dark_Mood({connect}) {
             console.log("setValue", value);
         }
     };
+
 
 
     const Mint_With_BNB = async () => {
@@ -56,7 +59,7 @@ export default function Dark_Mood({connect}) {
                 if (own_Address == acc) {
                     mintingWirePrice = 0;
                 } else {
-                    mintingWirePrice = await nftContractOf.methods.darkPrice().call()
+                    mintingWirePrice = await nftContractOf.methods.lightPrice().call()
                     mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
                     mintingWirePrice = parseFloat(mintingWirePrice);
                     mintingWirePrice = value * mintingWirePrice
@@ -65,7 +68,7 @@ export default function Dark_Mood({connect}) {
                 console.log("mintingWirePrice", mintingWirePrice);
 
 
-                let hash = await nftContractOf.methods.mintDark(acc, value).send({
+                let hash = await nftContractOf.methods.mintLight(acc, value).send({
                     from: acc,
                     value: mintingWirePrice
                 })
@@ -82,19 +85,76 @@ export default function Dark_Mood({connect}) {
 
         }
     }
-
-
-
-
-
-
-
     const minting_live_price = async () => {
         try {
 
             const web3 = window.web3;
             let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
-            let Value_in_bnb = await nftContractOf.methods.darkPrice().call()
+            let Value_in_bnb = await nftContractOf.methods.lightPrice().call()
+            Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
+            setValueBNB(Value_in_bnb)
+
+
+
+        } catch (e) {
+            console.log("Erroe while get BNB value", e);
+        }
+    }
+
+    const Mint_With_Eth = async () => {
+        let acc = await loadWeb4();
+
+        if (acc == "No Wallet") {
+            toast.error("No Wallet Connected")
+        }
+        else if (acc == "Wrong Network") {
+            toast.error("Wrong Newtwork please connect to test net")
+        } else {
+
+
+            try {
+                setButtonOne("Please Wait While Processing")
+
+                const web3 = window.web3;
+                let nftContractOf = new web3.eth.Contract(ethNftContractAbi, ethContractAddress);
+                let mintingWirePrice
+                let own_Address = await nftContractOf.methods.owner().call()
+                console.log("own_Address", own_Address);
+                if (own_Address == acc) {
+                    mintingWirePrice = 0;
+                } else {
+                    mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+                    mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
+                    mintingWirePrice = parseFloat(mintingWirePrice);
+                    mintingWirePrice = value * mintingWirePrice
+                    mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
+                }
+                console.log("mintingWirePrice", mintingWirePrice);
+
+
+                let hash = await nftContractOf.methods.mintLight(acc, value).send({
+                    from: acc,
+                    value: mintingWirePrice
+                })
+                toast.success("Transaction Confirmed")
+                setButtonOne("Mint With BNB")
+
+
+            } catch (e) {
+                console.log("Error while minting ", e)
+                toast.error("Transaction failed")
+                setButtonOne("Mint With WHE")
+
+            }
+
+        }
+    }
+    const minting_live_price_eth = async () => {
+        try {
+
+            const web3 = window.web3;
+            let nftContractOf = new web3.eth.Contract(ethNftContractAbi, ethContractAddress);
+            let Value_in_bnb = await nftContractOf.methods.lightPrice().call()
             Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
             setValueBNB(Value_in_bnb)
 
@@ -112,9 +172,22 @@ export default function Dark_Mood({connect}) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
     useEffect(() => {
         minting_live_price()
+        minting_live_price_eth()
     }, [])
+
 
 
 
@@ -163,8 +236,8 @@ export default function Dark_Mood({connect}) {
                                         </div>
 
                                         <div className="bttn">
-                                            <div className="btn fst_bttn">BNB</div>
-                                            <div className="btn fst_bttn">ETH</div>
+                                            <div className="btn fst_bttn" onClick={() => setchange_contract("bnb")}>BNB</div>
+                                            <div className="btn fst_bttn" onClick={() => setchange_contract("ETH")}>ETH</div>
                                         </div>
 
                                         <div className="heding">
@@ -190,7 +263,13 @@ export default function Dark_Mood({connect}) {
                                         </div>
 
                                         <div className="mint">
-                                            <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
+                                        {
+                         change_contract == "bnb" ?
+                         <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
+                         :
+                         <img src="mint.png" alt="" onClick={() => Mint_With_Eth()} />
+
+                      }
                                         </div>
                                     </div>
                                 </div>
