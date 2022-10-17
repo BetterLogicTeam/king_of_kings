@@ -359,3 +359,9 @@ border: 2px solid #585353;
     justify-content: end;
     margin-top: -4rem !important;
 }
+
+.active_bnb{
+    /* border: 4px solid rgb(15,172,244); */
+    /* cursor: pointer; */
+
+}

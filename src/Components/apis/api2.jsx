@@ -1,4 +1,5 @@
 import Web3 from "web3";
+const chainId = 5 // Polygon Mainnet
 let isItConnected = false;
 const networks = {
   bsc: {
@@ -28,19 +29,29 @@ const networks = {
   },
 };
 const changeNetwork = async ({ networkName }) => {
-  try {
-    if (!window.ethereum) throw new Error("No crypto wallet found");
-    await window.ethereum.request({
-      method: "wallet_addEthereumChain",
-      params: [
-        {
-          ...networks[networkName],
-        },
-      ],
-    });
-  } catch (err) {
-    console.log("not found");
-  }
+    if (window.ethereum.networkVersion !== chainId) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: Web3.utils.toHex(chainId) }]
+          });
+        } catch (err) {
+            // This error code indicates that the chain has not been added to MetaMask
+          if (err.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainName: 'Polygon Mainnet',
+                  chainId: Web3.utils.toHex(chainId),
+                  nativeCurrency: { name: 'MATIC', decimals: 18, symbol: 'MATIC' },
+                  rpcUrls: ['https://polygon-rpc.com/']
+                }
+              ]
+            });
+          }
+        }
+      }
 };
 const handleNetworkSwitch = async (networkName) => {
   await changeNetwork({ networkName });

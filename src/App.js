@@ -11,45 +11,16 @@ import {
 import Dark_Mood from './Components/Dark_mood/Dark_Mood';
 import { loadWeb3 } from './Components/apis/api';
 import { useEffect, useState } from 'react';
+import Web3 from "web3";
+import { loadWeb4 } from './Components/apis/api2';
 // import
 
 function App() {
   
   const [connect, setconnect] = useState(false)
+  const [check_Chain_id, setcheck_Chain_id] = useState("")
 
 
-
-  const connectWallte=async()=>{
-    try{
-
-      let acc = await loadWeb3();
-      // console.log("ACC=",acc)
-      if (acc == "No Wallet") {
-        setconnect(false)
-          // toas("No Wallet")
-      }
-      else if (acc == "Wrong Network") {
-          // setBtTxt("Wrong Network")
-        setconnect(false)
-
-      } else {
-        setconnect(true)
-
-          let myAcc = acc?.substring(0, 4) + "..." + acc?.substring(acc?.length - 4);
-          // setBtTxt(myAcc);
-
-      }
-
-    }catch(e){
-      console.log("Error while Connect Walte",e);
-    }
-  }
-
-  useEffect(() => {
-    setInterval(() => {
-      connectWallte();
-    }, 1000);
-}, []);
 
 
   

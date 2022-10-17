@@ -10,13 +10,17 @@ import { loadWeb3 } from '../apis/api';
 import notcoonect from '../../Assets/notconnect.png'
 import connected from '../../Assets/connected.png'
 import { loadWeb4 } from '../apis/api2';
+import Web3 from "web3";
 
 
-export default function Dark_Mood({ connect }) {
+
+export default function Dark_Mood() {
     let [value, setValue] = useState(1);
     let [btnOne, setButtonOne] = useState("Mint With BNB");
     const [ValueBNB, setValueBNB] = useState("")
     const [change_contract, setchange_contract] = useState("bnb")
+    const [check_Chain_id, setcheck_Chain_id] = useState("")
+    const [connect, setconnect] = useState(false)
 
 
 
@@ -34,6 +38,95 @@ export default function Dark_Mood({ connect }) {
             console.log("setValue", value);
         }
     };
+
+
+    
+
+  const getChainId = async () => {
+    try {
+      // const web3 = window.web3;
+    //   console.log("Chain_ID");
+
+      window.web3 = new Web3(window.ethereum);
+
+      await window.web3.eth.getChainId((err, netId) => {
+        setcheck_Chain_id(netId)
+        // NetId = netId
+        // setNetId_set(NetId)
+
+        if(netId==97){
+            setconnect(true)
+
+        }else if(netId==5){
+            setconnect(true)
+
+        }else{
+        setconnect(false)
+
+        }
+
+      }
+      )
+
+    } catch (e) {
+      console.log("Error while Get chain ID", e);
+    }
+  }
+
+
+  const connectWallte=async()=>{
+    try{
+      let acc 
+    //   console.log("change_contract",connect);
+      if(change_contract=="bnb"){
+
+         acc = await loadWeb3();
+      }else{
+         acc = await loadWeb4();
+
+      }
+
+      // console.log("ACC=",acc)
+      if (acc == "No Wallet") {
+        setconnect(false)
+          // toas("No Wallet")
+    //   console.log("Wal   let");
+
+      }
+      else if (acc == "Wrong Network") {
+          // setBtTxt("Wrong Network")
+        setconnect(false)
+    //   console.log("Wrong");
+
+
+      } else {
+        setconnect(true)
+    //   console.log("connect");
+
+
+          let myAcc = acc?.substring(0, 4) + "..." + acc?.substring(acc?.length - 4);
+          // setBtTxt(myAcc);
+
+      }
+
+    }catch(e){
+      console.log("Error while Connect Walte",e);
+    }
+  }
+
+  useEffect(() => {
+    connectWallte();
+
+  }, [change_contract])
+  
+  useEffect(() => {
+      connectWallte();
+      setInterval(() => {
+          getChainId()
+        
+      }, 1000);
+}, []);
+
 
 
 
@@ -169,20 +262,6 @@ export default function Dark_Mood({ connect }) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     useEffect(() => {
         minting_live_price()
         minting_live_price_eth()
@@ -209,9 +288,9 @@ export default function Dark_Mood({ connect }) {
             <div className='main_div'>
                 <div className="connected_div">
 
-                    {
-                        connect ? <> <img src={notcoonect} alt="" width="25%" /> </> : <><img src={connected} alt="" width="25%" /></>
-                    }
+                {
+            connect  ? <> <img src={connected} alt="" width="25%" /> </> : <><img src={ notcoonect} alt="" width="25%" /></>
+          }
                 </div>
                 <div className="">
                     <div className="container kig">
@@ -242,7 +321,11 @@ export default function Dark_Mood({ connect }) {
 
                                         <div className="heding">
                                             <h4 className='text-white pt-3'>GENESIS KING CROWN</h4>
-                                            <p>{ValueBNB} BNB</p>
+                                            <p>{ValueBNB} 
+                                            {
+                          check_Chain_id == 97 ? "BNB" : "ETH"
+                        }
+                                            </p>
                                         </div>
 
                                         <div className="scnd_emg">
@@ -262,14 +345,14 @@ export default function Dark_Mood({ connect }) {
                                             <div className="btn plus" onClick={() => increaseValue()}>+</div>{" "}
                                         </div>
 
-                                        <div className="mint">
-                                        {
-                         change_contract == "bnb" ?
-                         <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
-                         :
-                         <img src="mint.png" alt="" onClick={() => Mint_With_Eth()} />
+                                        <div className="mint" style={{cursor:"pointer"}}>
+                                            {
+                                                change_contract == "bnb" ?
+                                                    <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
+                                                    :
+                                                    <img src="mint.png" alt="" onClick={() => Mint_With_Eth()} />
 
-                      }
+                                            }
                                         </div>
                                     </div>
                                 </div>

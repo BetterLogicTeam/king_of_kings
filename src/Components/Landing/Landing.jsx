@@ -12,12 +12,17 @@ import { bnbContractAddress, bnbNftContractAbi, ethContractAddress, ethNftContra
 import { toast } from 'react-toastify';
 import { loadWeb3 } from '../apis/api';
 import { loadWeb4 } from '../apis/api2';
+import Web3 from "web3";
 
-function Landing({ connect }) {
+
+function Landing() {
   let [value, setValue] = useState(1);
   let [btnOne, setButtonOne] = useState("Mint With BNB");
   const [ValueBNB, setValueBNB] = useState("")
   const [change_contract, setchange_contract] = useState("bnb")
+  const [check_Chain_id, setcheck_Chain_id] = useState("")
+  const [connect, setconnect] = useState(false)
+
 
 
 
@@ -36,170 +41,252 @@ function Landing({ connect }) {
     }
   };
 
-  
- 
-    const Mint_With_BNB = async () => {
-      let acc = await loadWeb3();
-  
+  const getChainId = async () => {
+    try {
+      // const web3 = window.web3;
+
+      window.web3 = new Web3(window.ethereum);
+
+      await window.web3.eth.getChainId((err, netId) => {
+        setcheck_Chain_id(netId)
+        if (netId == 97) {
+          setconnect(true)
+
+        } else if (netId == 5) {
+          setconnect(true)
+
+        } else {
+          setconnect(false)
+
+        }
+
+      }
+      )
+
+    } catch (e) {
+      console.log("Error while Get chain ID", e);
+    }
+  }
+
+
+  const connectWallte = async () => {
+    try {
+      let acc
+      // console.log("change_contract", connect);
+      if (change_contract == "bnb") {
+        setconnect(true)
+
+        acc = await loadWeb3();
+      } else {
+        setconnect(true)
+
+        acc = await loadWeb4();
+
+      }
+
+      // console.log("ACC=",acc)
       if (acc == "No Wallet") {
-        toast.error("No Wallet Connected")
+        setconnect(false)
+        // toas("No Wallet")
+        // console.log("Wallet");
+
       }
       else if (acc == "Wrong Network") {
-        toast.error("Wrong Newtwork please connect to test net")
+        // setBtTxt("Wrong Network")
+        setconnect(false)
+        // console.log("Wrong");
+
+
       } else {
-  
-  
-        try {
-          setButtonOne("Please Wait While Processing")
-  
-          const web3 = window.web3;
-          let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
-          let mintingWirePrice
-          let own_Address = await nftContractOf.methods.owner().call()
-          console.log("own_Address",own_Address);
-          if (own_Address == acc) {
-            mintingWirePrice=0;
-          } else {
-            mintingWirePrice = await nftContractOf.methods.lightPrice().call()
-            mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
-            mintingWirePrice = parseFloat(mintingWirePrice);
-            mintingWirePrice = value * mintingWirePrice
-            mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
-          }
-          console.log("mintingWirePrice",mintingWirePrice);
-  
-         
-          let hash = await nftContractOf.methods.mintLight(acc, value).send({
-            from: acc,
-            value: mintingWirePrice
-          })
-          toast.success("Transaction Confirmed")
-          setButtonOne("Mint With BNB")
-  
-  
-        } catch (e) {
-          console.log("Error while minting ", e)
-          toast.error("Transaction failed")
-          setButtonOne("Mint With WHE")
-  
-        }
-  
+        setconnect(true)
+        // console.log("connect");
+
+
+        let myAcc = acc?.substring(0, 4) + "..." + acc?.substring(acc?.length - 4);
+        // setBtTxt(myAcc);
+
       }
+
+    } catch (e) {
+      console.log("Error while Connect Walte", e);
     }
-    const minting_live_price=async()=>{
-      try{
-        
+  }
+
+  useEffect(() => {
+    connectWallte();
+
+  }, [change_contract])
+
+  useEffect(() => {
+    setInterval(() => {
+      getChainId()
+    }, 5000);
+    connectWallte();
+  }, []);
+
+
+
+  const Mint_With_BNB = async () => {
+    let acc = await loadWeb3();
+
+    if (acc == "No Wallet") {
+      toast.error("No Wallet Connected")
+    }
+    else if (acc == "Wrong Network") {
+      toast.error("Wrong Newtwork please connect to test net")
+    } else {
+
+
+      try {
+        setButtonOne("Please Wait While Processing")
+
         const web3 = window.web3;
         let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
-        let Value_in_bnb=await nftContractOf.methods.lightPrice().call()
-        Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
-        setValueBNB(Value_in_bnb)
-    
-    
-        
-      }catch(e){
-        console.log("Erroe while get BNB value",e);
-      }
-    }
-    
-    const Mint_With_Eth = async () => {
-      let acc = await loadWeb4();
-  
-      if (acc == "No Wallet") {
-        toast.error("No Wallet Connected")
-      }
-      else if (acc == "Wrong Network") {
-        toast.error("Wrong Newtwork please connect to test net")
-      } else {
-  
-  
-        try {
-          setButtonOne("Please Wait While Processing")
-  
-          const web3 = window.web3;
-          let nftContractOf = new web3.eth.Contract(ethNftContractAbi, ethContractAddress);
-          let mintingWirePrice
-          let own_Address = await nftContractOf.methods.owner().call()
-          console.log("own_Address",own_Address);
-          if (own_Address == acc) {
-            mintingWirePrice=0;
-          } else {
-            mintingWirePrice = await nftContractOf.methods.lightPrice().call()
-            mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
-            mintingWirePrice = parseFloat(mintingWirePrice);
-            mintingWirePrice = value * mintingWirePrice
-            mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
-          }
-          console.log("mintingWirePrice",mintingWirePrice);
-  
-         
-          let hash = await nftContractOf.methods.mintLight(acc, value).send({
-            from: acc,
-            value: mintingWirePrice
-          })
-          toast.success("Transaction Confirmed")
-          setButtonOne("Mint With BNB")
-  
-  
-        } catch (e) {
-          console.log("Error while minting ", e)
-          toast.error("Transaction failed")
-          setButtonOne("Mint With WHE")
-  
+        let mintingWirePrice
+        let own_Address = await nftContractOf.methods.owner().call()
+        console.log("own_Address", own_Address);
+        if (own_Address == acc) {
+          mintingWirePrice = 0;
+        } else {
+          mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+          mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
+          mintingWirePrice = parseFloat(mintingWirePrice);
+          mintingWirePrice = value * mintingWirePrice
+          mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
         }
-  
+        console.log("mintingWirePrice", mintingWirePrice);
+
+
+        let hash = await nftContractOf.methods.mintLight(acc, value).send({
+          from: acc,
+          value: mintingWirePrice
+        })
+        toast.success("Transaction Confirmed")
+        setButtonOne("Mint With BNB")
+
+
+      } catch (e) {
+        console.log("Error while minting ", e)
+        toast.error("Transaction failed")
+        setButtonOne("Mint With WHE")
+
       }
+
     }
-    const minting_live_price_eth=async()=>{
-      try{
-        
+  }
+  const minting_live_price = async () => {
+    try {
+
+      const web3 = window.web3;
+      let nftContractOf = new web3.eth.Contract(bnbNftContractAbi, bnbContractAddress);
+      let Value_in_bnb = await nftContractOf.methods.lightPrice().call()
+      Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
+      setValueBNB(Value_in_bnb)
+
+
+
+    } catch (e) {
+      console.log("Erroe while get BNB value", e);
+    }
+  }
+
+  const Mint_With_Eth = async () => {
+    let acc = await loadWeb4();
+
+    if (acc == "No Wallet") {
+      toast.error("No Wallet Connected")
+    }
+    else if (acc == "Wrong Network") {
+      toast.error("Wrong Newtwork please connect to test net")
+    } else {
+
+
+      try {
+        setButtonOne("Please Wait While Processing")
+
         const web3 = window.web3;
         let nftContractOf = new web3.eth.Contract(ethNftContractAbi, ethContractAddress);
-        let Value_in_bnb=await nftContractOf.methods.lightPrice().call()
-        Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
-        setValueBNB(Value_in_bnb)
-    
-    
-        
-      }catch(e){
-        console.log("Erroe while get BNB value",e);
+        let mintingWirePrice
+        let own_Address = await nftContractOf.methods.owner().call()
+        console.log("own_Address", own_Address);
+        if (own_Address == acc) {
+          mintingWirePrice = 0;
+        } else {
+          mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+          mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
+          mintingWirePrice = parseFloat(mintingWirePrice);
+          mintingWirePrice = value * mintingWirePrice
+          mintingWirePrice = web3.utils.toWei(mintingWirePrice.toString());
+        }
+        console.log("mintingWirePrice", mintingWirePrice);
+
+
+        let hash = await nftContractOf.methods.mintLight(acc, value).send({
+          from: acc,
+          value: mintingWirePrice
+        })
+        toast.success("Transaction Confirmed")
+        setButtonOne("Mint With BNB")
+
+
+      } catch (e) {
+        console.log("Error while minting ", e)
+        toast.error("Transaction failed")
+        setButtonOne("Mint With WHE")
+
       }
+
     }
-  
+  }
+  const minting_live_price_eth = async () => {
 
- 
+    try {
 
-
-
-
-
-
-
-
-
-
+      const web3 = window.web3;
+      let nftContractOf = new web3.eth.Contract(ethNftContractAbi, ethContractAddress);
+      console.log("WEB3", nftContractOf);
+      let Value_in_bnb = await nftContractOf.methods.lightPrice().call()
+      Value_in_bnb = web3.utils.fromWei(Value_in_bnb);
+      setValueBNB(Value_in_bnb)
 
 
 
+    } catch (e) {
+      console.log("Erroe while get BNB value", e);
+    }
+  }
 
 
+  const style_css_js = async () => {
+    // if (change_contract == "bnb") {
+    // const note = document.querySelector('.active_bnb');
+    // note.style.border = '4px solid rgb(15,172,244)';
+    // }else if (change_contract == "ETH"){
+    //   const note = document.querySelector('.active_eth');
+    //   note.style.border = '4px solid rgb(15,172,244)';
+    // }
+  }
 
-useEffect(() => {
-  minting_live_price()
-  minting_live_price_eth()
-}, [])
+  useEffect(() => {
+    getChainId()
+    if (change_contract == "bnb") {
+      setconnect(true)
+
+      minting_live_price()
+    } else {
+      setconnect(true)
+
+      minting_live_price_eth()
+
+    }
 
 
+    setInterval(() => {
+    }, 1000);
+    style_css_js()
 
 
-
-
-
-
-  // setInterval(() => {
-
-  //   document.getElementById('vid').play();
-  // }, 1000);
+  }, [change_contract])
 
   return (
     <>
@@ -207,7 +294,7 @@ useEffect(() => {
         <div className="connected_div">
 
           {
-            connect ? <> <img src={notcoonect} alt="" width="25%" /> </> : <><img src={connected} alt="" width="25%" /></>
+            connect ? <> <img src={connected} alt="" width="25%" /> </> : <><img src={notcoonect} alt="" width="25%" /></>
           }
         </div>
         <div className="">
@@ -222,7 +309,7 @@ useEffect(() => {
                       {/* <video src="light.mp4" className='w-100 '></video> */}
                       <div className="vid_div">
                         {/* <video src="Dark.mp4" className='w-100 '></video> */}
-                        <video autoplay="autoplay" loop width="100%" id='vid'>
+                        <video autoPlay="autoPlay" loop width="100%" id='vid'>
                           <source src="light.mp4" type="video/mp4" />
 
                         </video>
@@ -238,13 +325,17 @@ useEffect(() => {
                     </div>
 
                     <div className="bttn">
-                      <div className="btn fst_bttn" onClick={()=>setchange_contract("bnb")}>BNB</div>
-                      <div className="btn fst_bttn" onClick={()=>setchange_contract("ETH")}>ETH</div>
+                      <div className="btn fst_bttn active_bnb " id="" onClick={() => (setchange_contract("bnb"))}>BNB</div>
+                      <div className="btn fst_bttn active_eth" id="" onClick={() => setchange_contract("ETH")}>ETH</div>
                     </div>
 
                     <div className="heding">
                       <h4 className='text-white pt-3'>GENESIS KING CROWN</h4>
-                      <p>{ValueBNB} BNB</p>
+                      <p>{ValueBNB}
+                        {
+                          check_Chain_id == 97 ? "BNB" : "ETH"
+                        }
+                      </p>
                     </div>
 
                     <div className="scnd_emg">
@@ -264,12 +355,12 @@ useEffect(() => {
                       <div className="btn plus" onClick={() => increaseValue()}>+</div>{" "}
                     </div>
 
-                    <div className="mint">
+                    <div className="mint" style={{cursor:"pointer"}}>
                       {
-                         change_contract == "bnb" ?
-                         <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
-                         :
-                         <img src="mint.png" alt="" onClick={() => Mint_With_Eth()} />
+                        change_contract == "bnb" ?
+                          <img src="mint.png" alt="" onClick={() => Mint_With_BNB()} />
+                          :
+                          <img src="mint.png" alt="" onClick={() => Mint_With_Eth()} />
 
                       }
                     </div>
