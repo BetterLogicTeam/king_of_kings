@@ -152,7 +152,7 @@ export default function Dark_Mood() {
                 if (own_Address == acc) {
                     mintingWirePrice = 0;
                 } else {
-                    mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+                    mintingWirePrice = await nftContractOf.methods.darkPrice().call()
                     mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
                     mintingWirePrice = parseFloat(mintingWirePrice);
                     mintingWirePrice = value * mintingWirePrice
@@ -161,7 +161,7 @@ export default function Dark_Mood() {
                 console.log("mintingWirePrice", mintingWirePrice);
 
 
-                let hash = await nftContractOf.methods.mintLight(acc, value).send({
+                let hash = await nftContractOf.methods.mintDark(acc, value).send({
                     from: acc,
                     value: mintingWirePrice
                 })
@@ -216,7 +216,7 @@ export default function Dark_Mood() {
                 if (own_Address == acc) {
                     mintingWirePrice = 0;
                 } else {
-                    mintingWirePrice = await nftContractOf.methods.lightPrice().call()
+                    mintingWirePrice = await nftContractOf.methods.darkPrice().call()
                     mintingWirePrice = web3.utils.fromWei(mintingWirePrice);
                     mintingWirePrice = parseFloat(mintingWirePrice);
                     mintingWirePrice = value * mintingWirePrice
@@ -225,7 +225,7 @@ export default function Dark_Mood() {
                 console.log("mintingWirePrice", mintingWirePrice);
 
 
-                let hash = await nftContractOf.methods.mintLight(acc, value).send({
+                let hash = await nftContractOf.methods.mintDark(acc, value).send({
                     from: acc,
                     value: mintingWirePrice
                 })
